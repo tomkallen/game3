@@ -16,7 +16,7 @@ export default class Player extends Phaser.Sprite {
     this.alive = true
 
     this.game.add.existing(this)
-    game.log(`player created`)
+    game.log(`Player created`)
   };
 
   update () { }

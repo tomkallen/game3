@@ -1,11 +1,11 @@
 import game from '../game'
-import {Player, Enemy} from "../classes";
-import controller from "../classes/Controller"
+import { Player, Enemy, GameObject, Pool } from '../classes'
+import controller from '../classes/Controller'
 
 export default class Main {
   create () {
     game.stage.backgroundColor = '#555'
-
+    game.player = Main.createPlayer()
   }
 
   update () {
@@ -13,14 +13,9 @@ export default class Main {
     // game.add.text(130, 676, `Hi`, style)
   }
 
-  reset () {
-    game.state.start('Level')
-  }
-
-  setupPlayer(){
-    game.player = new Player('player')
-    game.player.hp = controller.playerHp
-    game.player.gold = controller.gold
-    game.player.create(100,100)
+  static createPlayer () {
+    const player =  new Player('player')
+    player.weapon = new Pool(GameObject, {size: 50, name: 'player bullets', sprites: ['basic bullet']})
+      return player.create(100, 100)
   }
 }
