@@ -1,14 +1,17 @@
-import 'pixi';
-import 'p2';
+import 'pixi'
+import 'p2'
 import Phaser from 'phaser-ce'
+import Preload from './stages/preload'
 import Main from './stages/main'
-// import {Text} from './text.plugin'
-// import {HealthBar} from './bar.plugin'
 
-const game = new Phaser.Game(1216, 760, Phaser.AUTO)
+Phaser.Game.prototype.log = function (message) {
+  this.devMode && console.log(message)
+}
+
+const game = new Phaser.Game(800, 720, Phaser.AUTO)
 
 game.state.add('Main', Main)
-// game.state.add('Level', Level)
-game.state.start('Main')
-// export {Text, HealthBar}
+game.state.add('Preload', Preload)
+game.state.start('Preload')
+
 export default game

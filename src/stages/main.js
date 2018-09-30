@@ -1,13 +1,16 @@
 import game from '../game'
-// import {GameObject, Flag, Pool, Blob, BasicBullet, HeavyBullet, Player, Spawner, Chest, Coin} from "../classes";
+import {Player, Enemy} from "../classes";
 
 export default class Main {
   create () {
-
+    game.stage.backgroundColor = '#555'
+    game.player = new Player('player')
+    game.player.create(100,100)
   }
 
   update () {
-    this.add.text(130, 676, `Hi`)
+    var style = { font: 'bold 32px Arial', fill: '#fff', boundsAlignH: 'center', boundsAlignV: 'middle' }
+    game.add.text(130, 676, `Hi`, style)
   }
 
   reset () {
