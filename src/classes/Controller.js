@@ -16,11 +16,14 @@ class Controller {
 
     this.playerCritModifier = 2
     this.playerCritChance = 0.05
-    this.basePlayerDamage = 3
     this.playerLevel = 1
     this.playerDamageModifier = 1.02
-    this.baseStepsForLevel = 5
     this.playerXpStep = 0
+    this.playerProjectileSpeed = 250
+    this.baseStepsForLevel = 5
+    this.basePlayerDamage = 3
+
+
   }
 
   get enemyHp () {

@@ -8,6 +8,8 @@ export default class Player extends Phaser.Sprite {
     this.exists = true
     this.anchor.setTo(0.5, 0.5)
     this.game.physics.enable(this)
+    this.timer = 0
+    this.spacing = 300 // FIX LATER
   }
 
   create (x, y) {
@@ -20,5 +22,6 @@ export default class Player extends Phaser.Sprite {
   };
 
   update () { }
+
 
 }
