@@ -1,4 +1,5 @@
-import game from '../game'
+import game, { HealthBar } from '../game'
+import controller from './Controller'
 import Phaser from 'phaser-ce'
 
 export default class Player extends Phaser.Sprite {
@@ -8,8 +9,17 @@ export default class Player extends Phaser.Sprite {
     this.exists = true
     this.anchor.setTo(0.5, 0.5)
     this.game.physics.enable(this)
-    this.timer = 0
-    this.spacing = 300 // FIX LATER
+    this.health = controller.playerHp
+
+    this.healthBar = new HealthBar(game, {
+      width: 360,
+      height: 20,
+      x: 200,
+      y: 680,
+      bg: {color: '#651828'},
+      bar: {color: '#9ad5ff'},
+      animationDuration: 100
+    })
   }
 
   create (x, y) {
@@ -21,7 +31,8 @@ export default class Player extends Phaser.Sprite {
     game.log(`Player created`)
   };
 
-  update () { }
-
+  update () {
+    this.healthBar.setPercent(this.health / controller.playerHp * 100)
+  }
 
 }

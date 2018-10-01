@@ -12,13 +12,13 @@ export default class Enemy extends Phaser.Sprite {
     this.body.immovable = false
     this.alive = false
     this.healthBar = new HealthBar(game, {
-      width: 300,
+      width: 360,
       height: 20,
       x: 200,
       y: 24,
       bg: {color: '#651828'},
       bar: {color: '#FEFF03'},
-      animationDuration: 100
+      animationDuration: 200
     });
   }
 

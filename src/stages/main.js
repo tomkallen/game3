@@ -18,13 +18,16 @@ export default class Main {
       new Pool(BasicBullet, {size: 50, name: 'player bullets', sprites: ['basic bullet']})
     )
     game.textController = {
-      levelText: game.add.text(200, 40, '0', style)
+      levelText: game.add.text(200, 40, '0', style),
+      goldText: game.add.text(600, 40, '0', style)
     }
 
   }
 
   update () {
     game.textController.levelText.text = controller.level
+    game.textController.goldText.text = controller.gold
+
     Main.fire()
     game.physics.arcade.overlap(
       game.projectiles,
@@ -34,7 +37,7 @@ export default class Main {
 
   static createPlayer () {
     const player = new Player('player')
-    player.create(200, 620)
+    player.create(200, 580)
     return player
   }
 
