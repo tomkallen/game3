@@ -1,5 +1,3 @@
-import game from '../game'
-
 class Controller {
   constructor () {
     this.gameLevel = 1
@@ -19,7 +17,7 @@ class Controller {
     this.playerLevel = 1
     this.playerDamageModifier = 1.02
     this.playerXpStep = 0
-    this.playerProjectileSpeed = 250
+    this.playerProjectileSpeed = 550
     this.baseStepsForLevel = 5
     this.basePlayerDamage = 3
 
@@ -42,6 +40,10 @@ class Controller {
     let damage = this.basePlayerDamage * (Math.pow(this.playerLevel, this.playerDamageModifier))
     if (Math.random() <= this.playerCritChance) damage *= this.playerCritModifier
     return damage
+  }
+
+  get level(){
+    return this.gameLevel
   }
 
   levelUpGame () {

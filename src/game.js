@@ -3,6 +3,7 @@ import 'p2'
 import Phaser from 'phaser-ce'
 import Preload from './stages/preload'
 import Main from './stages/main'
+import { HealthBar } from './plugins/bar.plugin'
 
 Phaser.Game.prototype.log = function (message) {
   this.devMode && console.log(message)
@@ -14,4 +15,5 @@ game.state.add('Main', Main)
 game.state.add('Preload', Preload)
 game.state.start('Preload')
 
+export { HealthBar }
 export default game
