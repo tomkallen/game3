@@ -1,25 +1,41 @@
+import game from '../game'
+import Projectile from './Projectile'
+
 class Controller {
   constructor () {
+
+    // Levels
     this.gameLevel = 1
     this.playerLevel = 1
+    this.playerXpStep = 0
+    this.baseStepsForLevel = 5
+    this.readyForNextLevel = false
+    this.autoLevelUp = true
 
+    // Waves
+    this.currentWave = 1
+    this.baseWaveCount = 5
+
+    // Gold
     this.gold = 0
+
+    // Enemy dmg & hp
+    this.enemyActive = false
+    this.enemyKilled = false
 
     this.enemyDamageModifier = 1.06
     this.enemyHpModifier = 1.06
     this.enemyGoldModifier = 1.05
     this.baseEnemyDamage = 2
-    this.baseEnemyHp = 100
+    this.baseEnemyHp = 30
     this.baseEnemyGold = 2
 
+    // Player dmg & hp
     this.playerCritModifier = 2
     this.playerCritChance = 0.05
-    this.playerLevel = 1
     this.playerDamageModifier = 1.02
-    this.playerXpStep = 0
     this.playerProjectileSpeed = 550
-    this.baseStepsForLevel = 5
-    this.basePlayerDamage = 3
+    this.basePlayerDamage = 12
     this.basePlayerHp = 100
     this.playerHPModifier = 1.02
   }
@@ -46,16 +62,35 @@ class Controller {
     return damage
   }
 
+  get waveCountForLevel () {
+    return this.baseWaveCount
+  }
+
   get level () {
     return this.gameLevel
   }
 
-  levelUpGame () {
+  onEnemyKill () {
+    game.log('Enemy dies')
+    this.enemyActive = false
     this.addGold()
-    this.gameLevel++
+    this.currentWave += 1
+    if (this.currentWave > this.waveCountForLevel) {
+      this.readyForNextLevel = true
+      if (this.autoLevelUp) this.levelUpGame()
+      else this.currentWave = this.waveCountForLevel
+    }
   }
 
-  addGold() {
+  levelUpGame () {
+    game.log('Next level')
+    this.gameLevel++
+    this.currentWave = 1
+    this.readyForNextLevel = false
+  }
+
+  addGold () {
+    game.log(`Got ${this.enemyGold} gold`)
     this.gold += this.enemyGold
   }
 
@@ -66,6 +101,10 @@ class Controller {
       this.playerXpStep = 0
       this.playerLevel += 1
     }
+  }
+
+  update () {
+    game.physics.arcade.overlap(this, Projectile, () => console.log(1))
   }
 }
 
