@@ -7,15 +7,13 @@ export default class Enemy extends Phaser.Sprite {
     super(game, 0, 0, sprite)
     this.game = game
     this.exists = false
-    this.anchor.setTo(0.5, 0.5)
+    this.anchor.setTo(0.5)
     this.game.physics.enable(this)
     this.body.immovable = false
     this.alive = false
-
-
   }
 
-  spawn (x, y) {
+  spawn () {
     this.reset(200, 0)
     this.alive = true
     this.exists = true
@@ -30,23 +28,31 @@ export default class Enemy extends Phaser.Sprite {
 
   onDeath () {
     this.healthBar.kill()
-    controller.enemyActive = false
     this.kill()
-    setTimeout(Enemy.respawn, 2000)
+    controller.enemyActive = false
+    setTimeout(Enemy.respawn, controller.respawnTimer)
   }
 
   onHit (bullet) {
+    if (!controller.enemyActive) return
+    this.blink()
     bullet.kill()
     game.sfx.lowHit.play()
-    const damage = controller.playerDamage
+    const data = controller.playerDamage
+    const damage = data.damage
+    const critical = data.critical
+    const type = critical ? 'crit' : 'hit'
     this.health -= damage
-    Text.combat(this, damage, 'hit')
+    Text.combat(this, damage, type)
     if (this.health <= 0) {
       this.onDeath()
       controller.onEnemyKill()
     }
-    game.log(`Enemy hit for ${damage}, got his hp to ${this.health} on level ${controller.level}`)
+  }
 
+  blink () {
+    this.tint = 0xff0000
+    window.setTimeout(() => this.tint = 0xffffff, 40)
   }
 
   update () {
@@ -61,12 +67,11 @@ export default class Enemy extends Phaser.Sprite {
 
   getTween () {
     const tween = game.add.tween(this)
-    game.log(this)
-    tween.to({x: 200, y: 100}, 1000, undefined, true)
+    tween.to({x: 200, y: 120}, 1000, undefined, true)
     tween.onComplete.add(() => {
       this.healthBar = new HealthBar(game, {
         width: 360,
-        height: 20,
+        height: 10,
         x: 200,
         y: 24,
         bg: {color: '#651828'},

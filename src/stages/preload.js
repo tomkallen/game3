@@ -8,11 +8,11 @@ export default class Preload {
     game.load.image('player', '/src/sprites/enemy.png')
     game.load.image('basic bullet', '/src/sprites/bullet.png')
     game.load.image('background_1', '/src/sprites/backgrounds/starry_1.png')
-
     game.load.image('button96x32', '/src/sprites/buttons/button96x32.png')
-    game.load.onLoadComplete.addOnce(this.onLoadComplete, this)
 
     game.load.audio('low_hit', '/src/sounds/low_hit.wav')
+
+    game.load.onLoadComplete.addOnce(this.onLoadComplete, this)
   }
 
   create () {

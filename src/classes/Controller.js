@@ -1,4 +1,4 @@
-import game from '../game'
+import game, { Text } from '../game'
 import Projectile from './Projectile'
 
 class Controller {
@@ -11,41 +11,58 @@ class Controller {
     this.baseStepsForLevel = 5
     this.readyForNextLevel = false
     this.autoLevelUp = true
+    this.respawnTimer = 500
 
     // Waves
     this.currentWave = 1
-    this.baseWaveCount = 5
+    this.baseWaveCount = 3
 
     // Gold
     this.gold = 0
 
     // Enemy dmg & hp
     this.enemyActive = false
-    this.enemyKilled = false
 
-    this.enemyDamageModifier = 1.06
-    this.enemyHpModifier = 1.06
-    this.enemyGoldModifier = 1.05
+    this.enemyDamageModifier = 1.2
+    this.enemyHpModifier = 1.2
+    this.enemyGoldModifier = 1.04
     this.baseEnemyDamage = 2
-    this.baseEnemyHp = 30
+    this.baseEnemyHp = 50
     this.baseEnemyGold = 2
 
     // Player dmg & hp
-    this.playerCritModifier = 2
-    this.playerCritChance = 0.05
-    this.playerDamageModifier = 1.02
     this.playerProjectileSpeed = 550
-    this.basePlayerDamage = 12
-    this.basePlayerHp = 100
-    this.playerHPModifier = 1.02
+    this.playerProjectileSpacing = 750
+
+    this.player = {
+      gold: 0,
+      level: 1,
+      upgradesPerLevel: 5,
+      damage: {
+        current: 12,
+        modifierPerUpgrade: 1.015,
+        modifierPerLevel: 2
+      },
+      critical: {
+        chance: 0.05,
+        multiplier: 2
+      },
+      health: {
+        current: 100,
+        max: 100,
+        modifierPerUpgrade: 1.015,
+        modifierPerLevel: 2,
+        regenRate: 1.02
+      }
+    }
   }
 
   get enemyHp () {
-    return this.baseEnemyHp * Math.round((Math.pow(this.gameLevel, this.enemyHpModifier)))
+    return this.baseEnemyHp
   }
 
   get playerHp () {
-    return this.basePlayerHp * Math.round((Math.pow(this.playerLevel, this.playerHPModifier)))
+    return this.player.health.current
   }
 
   get enemyDamage () {
@@ -57,9 +74,10 @@ class Controller {
   }
 
   get playerDamage () {
-    let damage = this.basePlayerDamage * Math.round((Math.pow(this.playerLevel, this.playerDamageModifier)))
-    if (Math.random() <= this.playerCritChance) damage *= this.playerCritModifier
-    return damage
+    let damage = this.player.damage.current
+    const critical = Math.random() <= this.player.critical.chance
+    if (critical) damage *= this.player.critical.multiplier
+    return {damage, critical}
   }
 
   get waveCountForLevel () {
@@ -84,9 +102,11 @@ class Controller {
 
   levelUpGame () {
     game.log('Next level')
+    Text.level(`Next Level`, 'gold')
     this.gameLevel++
     this.currentWave = 1
     this.readyForNextLevel = false
+    this.baseEnemyHp = Math.round(this.baseEnemyHp * this.enemyHpModifier)
   }
 
   addGold () {
