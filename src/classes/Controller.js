@@ -6,9 +6,10 @@ class Controller {
 
     // Levels
     this.gameLevel = 1
-    this.playerLevel = 1
-    this.playerXpStep = 0
+    this.upgradeCost = 120
+
     this.baseStepsForLevel = 5
+    this.currentUpgradeStep = 0
     this.readyForNextLevel = false
     this.autoLevelUp = true
     this.respawnTimer = 500
@@ -28,7 +29,7 @@ class Controller {
     this.enemyGoldModifier = 1.04
     this.baseEnemyDamage = 2
     this.baseEnemyHp = 50
-    this.baseEnemyGold = 2
+    this.enemyGold = 20
 
     // Player dmg & hp
     this.playerProjectileSpeed = 550
@@ -57,6 +58,20 @@ class Controller {
     }
   }
 
+  upgrade () {
+    this.currentUpgradeStep++
+    this.player.gold -= this.upgradeCost
+    this.player.damage.current = Math.round(this.player.damage.current * 1.15)
+    this.player.health.max = Math.round(this.player.health.max * 1.15)
+    if (this.currentUpgradeStep > this.stepsForLevel) {
+      this.currentUpgradeStep = 0
+      this.player.damage.current *= 2
+      this.player.health.max *= 2
+      this.player.level++
+      this.upgradeCost = Math.round(this.upgradeCost * 3)
+    } else this.upgradeCost = Math.round(this.upgradeCost * 1.33)
+  }
+
   get enemyHp () {
     return this.baseEnemyHp
   }
@@ -67,10 +82,6 @@ class Controller {
 
   get enemyDamage () {
     return this.baseEnemyDamage * Math.round((Math.pow(this.gameLevel, this.enemyDamageModifier)))
-  }
-
-  get enemyGold () {
-    return this.baseEnemyGold * Math.round((Math.pow(this.gameLevel, this.enemyGoldModifier)))
   }
 
   get playerDamage () {
@@ -106,21 +117,17 @@ class Controller {
     this.gameLevel++
     this.currentWave = 1
     this.readyForNextLevel = false
+    this.enemyGold = Math.round(this.enemyGold * 1.22)
     this.baseEnemyHp = Math.round(this.baseEnemyHp * this.enemyHpModifier)
   }
 
   addGold () {
     game.log(`Got ${this.enemyGold} gold`)
-    this.gold += this.enemyGold
+    this.player.gold += this.enemyGold
   }
 
-  increasePlayerXp () {
-    const stepsRequired = this.baseStepsForLevel * Math.floor(this.gameLevel / 100)
-    this.playerXpStep += 1
-    if (this.playerXpStep > stepsRequired) {
-      this.playerXpStep = 0
-      this.playerLevel += 1
-    }
+  get stepsForLevel () {
+    return this.baseStepsForLevel + Math.floor(this.gameLevel / 100)
   }
 
   update () {

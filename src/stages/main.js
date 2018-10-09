@@ -16,32 +16,46 @@ export default class Main {
 
     game.projectiles = new Pool(BasicBullet, {size: 50, name: 'player bullets', sprites: ['basic bullet']})
     const nextLevel = game.add.group()
-    nextLevel.add(game.add.button(300, 80, 'button96x32', this.onNextLevelClick, this))
+    nextLevel.add(game.add.button(300, 80, 'button96x32', Main.onNextLevelClick, this))
     nextLevel.add(game.add.text(330, 86, 'next', {font: '16px Arial', fill: '#000'}))
 
-    game.buttons = {nextLevel}
+    const upgrade = game.add.group()
+    upgrade.add(game.add.button(630, 120, 'button96x32', Main.onLevelUpClick, this))
+
+    game.buttons = {nextLevel, upgrade}
     game.buttons.nextLevel.visible = false
+    game.buttons.upgrade.visible = false
 
     game.textController = {
       levelText: game.add.text(320, 40, '0', style),
-      goldText: game.add.text(600, 40, '0', style),
-      waveText: game.add.text(20, 40, 'Wave 1', style)
-
+      waveText: game.add.text(20, 40, 'Wave 1', style),
+      upgradeText: game.add.text(650, 126, 'upgrade', {font: '16px Arial', fill: '#000'}),
+      progress: game.add.text(500, 300, 'text', {font: '16px Arial', fill: '#fff'}),
+      stats: game.add.text(500, 340, 'text', {font: '16px Arial', fill: '#fff'}),
+      cost:  game.add.text(500, 380, 'text', {font: '16px Arial', fill: '#fff'}),
     }
   }
 
-  onNextLevelClick () {
+  static onLevelUpClick () {
+    game.buttons.upgrade.visible = false
+    controller.upgrade()
+  }
+
+  static onNextLevelClick () {
     game.buttons.nextLevel.visible = false
-    game.enemy.onDeath()
     controller.levelUpGame()
+    game.enemy.onNextLevel()
   }
 
   update () {
     game.textController.levelText.text = `Level ${controller.level}`
-    game.textController.goldText.text = controller.gold
     game.textController.waveText.text = `Wave ${controller.currentWave} / ${controller.waveCountForLevel}`
+    game.textController.progress.text = `Level ${controller.player.level}, upgrade ${controller.currentUpgradeStep} / ${controller.stepsForLevel}`
+    game.textController.stats.text = `hp ${controller.player.health.max} damage ${controller.player.damage.current}`
+    game.textController.cost.text = `Gold ${controller.player.gold}, cost ${controller.upgradeCost} `
 
     if (controller.readyForNextLevel) game.buttons.nextLevel.visible = true
+    if (controller.player.gold >= controller.upgradeCost) game.buttons.upgrade.visible = true
 
     Main.fire()
     game.physics.arcade.overlap(

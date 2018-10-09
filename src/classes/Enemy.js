@@ -26,6 +26,12 @@ export default class Enemy extends Phaser.Sprite {
     this.getTween()
   }
 
+  onNextLevel () {
+    this.health = controller.enemyHp
+    this.gold = controller.enemyGold
+    this.damage = controller.enemyDamage
+  }
+
   onDeath () {
     this.healthBar.kill()
     this.kill()
