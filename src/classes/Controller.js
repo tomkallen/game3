@@ -1,8 +1,22 @@
 import game, { Text } from '../game'
-import Projectile from './Projectile'
+
+const ENEMY_GOLD = 50
+const ENEMY_GOLD_MODIFIER = 1.11
+const ENEMY_HP = 25
+const ENEMY_HP_MODIFIER = 1.125
+const PLAYER_XP = 200
+const PLAYER_XP_MODIFIER = 1.15
 
 class Controller {
+
   constructor () {
+    this.world = {
+      level: 1,
+      zone: 1,
+      wave: 1,
+      wavesPerZone: 2,
+      zonesPerLevel: 100
+    }
 
     // Levels
     this.gameLevel = 1
@@ -11,12 +25,7 @@ class Controller {
     this.baseStepsForLevel = 5
     this.currentUpgradeStep = 0
     this.readyForNextLevel = false
-    this.autoLevelUp = true
-    this.respawnTimer = 500
-
-    // Waves
-    this.currentWave = 1
-    this.baseWaveCount = 3
+    this.respawnTimer = 250
 
     // Gold
     this.gold = 0
@@ -24,20 +33,15 @@ class Controller {
     // Enemy dmg & hp
     this.enemyActive = false
 
-    this.enemyDamageModifier = 1.2
-    this.enemyHpModifier = 1.2
-    this.enemyGoldModifier = 1.04
-    this.baseEnemyDamage = 2
-    this.baseEnemyHp = 50
-    this.enemyGold = 20
-
     // Player dmg & hp
-    this.playerProjectileSpeed = 550
-    this.playerProjectileSpacing = 750
+    this.playerProjectileSpeed = 1500
+    this.playerProjectileSpacing = 250
 
     this.player = {
       gold: 0,
       level: 1,
+      xp: 0,
+      xpNeeded: 200,
       upgradesPerLevel: 5,
       damage: {
         current: 12,
@@ -47,13 +51,6 @@ class Controller {
       critical: {
         chance: 0.05,
         multiplier: 2
-      },
-      health: {
-        current: 100,
-        max: 100,
-        modifierPerUpgrade: 1.015,
-        modifierPerLevel: 2,
-        regenRate: 1.02
       }
     }
   }
@@ -62,26 +59,24 @@ class Controller {
     this.currentUpgradeStep++
     this.player.gold -= this.upgradeCost
     this.player.damage.current = Math.round(this.player.damage.current * 1.15)
-    this.player.health.max = Math.round(this.player.health.max * 1.15)
     if (this.currentUpgradeStep > this.stepsForLevel) {
       this.currentUpgradeStep = 0
       this.player.damage.current *= 2
-      this.player.health.max *= 2
       this.player.level++
       this.upgradeCost = Math.round(this.upgradeCost * 3)
     } else this.upgradeCost = Math.round(this.upgradeCost * 1.33)
   }
 
-  get enemyHp () {
-    return this.baseEnemyHp
+  getEnemyGold () {
+    return Math.round(ENEMY_GOLD * Math.pow(ENEMY_GOLD_MODIFIER, this.world.zone))
   }
 
-  get playerHp () {
-    return this.player.health.current
+  getKillsForLevel () {
+    return Math.round(PLAYER_XP * Math.pow(PLAYER_XP_MODIFIER, this.player.level))
   }
 
-  get enemyDamage () {
-    return this.baseEnemyDamage * Math.round((Math.pow(this.gameLevel, this.enemyDamageModifier)))
+  getEnemyHP () {
+    return Math.round(ENEMY_HP * Math.pow(ENEMY_HP_MODIFIER, this.world.zone))
   }
 
   get playerDamage () {
@@ -91,47 +86,44 @@ class Controller {
     return {damage, critical}
   }
 
-  get waveCountForLevel () {
-    return this.baseWaveCount
-  }
-
-  get level () {
-    return this.gameLevel
-  }
-
   onEnemyKill () {
-    game.log('Enemy dies')
     this.enemyActive = false
     this.addGold()
-    this.currentWave += 1
-    if (this.currentWave > this.waveCountForLevel) {
-      this.readyForNextLevel = true
-      if (this.autoLevelUp) this.levelUpGame()
-      else this.currentWave = this.waveCountForLevel
+    this.player.xp += 1
+    if (this.player.xp > this.player.xpNeeded) this.onPlayerLevelUp()
+    this.world.wave += 1
+    if (this.world.wave > this.world.wavesPerZone) {
+      this.world.wave = 1
+      this.world.zone += 1
+      if (this.world.zone > this.world.zonesPerLevel) this.onGameLevelChange()
     }
+  }
+
+  onGameLevelChange () {
+    this.world.zone = 1
+    this.world.level += 1
+  }
+
+  onPlayerLevelUp () {
+    this.player.xp = 0
+    this.player.level += 1
+    this.player.xpNeeded = this.getKillsForLevel()
   }
 
   levelUpGame () {
     game.log('Next level')
     Text.level(`Next Level`, 'gold')
     this.gameLevel++
-    this.currentWave = 1
     this.readyForNextLevel = false
-    this.enemyGold = Math.round(this.enemyGold * 1.22)
-    this.baseEnemyHp = Math.round(this.baseEnemyHp * this.enemyHpModifier)
   }
 
   addGold () {
-    game.log(`Got ${this.enemyGold} gold`)
-    this.player.gold += this.enemyGold
+    game.log(`Got ${this.getEnemyGold()} gold`)
+    this.player.gold += this.getEnemyGold()
   }
 
   get stepsForLevel () {
     return this.baseStepsForLevel + Math.floor(this.gameLevel / 100)
-  }
-
-  update () {
-    game.physics.arcade.overlap(this, Projectile, () => console.log(1))
   }
 }
 

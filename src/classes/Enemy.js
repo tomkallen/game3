@@ -17,9 +17,9 @@ export default class Enemy extends Phaser.Sprite {
     this.reset(200, 0)
     this.alive = true
     this.exists = true
-    this.health = controller.enemyHp
-    this.gold = controller.enemyGold
-    this.damage = controller.enemyDamage
+    this.health = controller.getEnemyHP()
+    this.maxHP = controller.getEnemyHP()
+    this.gold = controller.getEnemyGold()
     game.log(`Creating enemy with ${this.health} hp and ${this.gold} gold`)
     game.add.existing(this)
     game.physics.arcade.enable(this)
@@ -27,9 +27,9 @@ export default class Enemy extends Phaser.Sprite {
   }
 
   onNextLevel () {
-    this.health = controller.enemyHp
-    this.gold = controller.enemyGold
-    this.damage = controller.enemyDamage
+    this.health = controller.getEnemyHP()
+    this.maxHP = controller.getEnemyHP()
+    this.gold = controller.getEnemyGold()
   }
 
   onDeath () {
@@ -62,7 +62,7 @@ export default class Enemy extends Phaser.Sprite {
   }
 
   update () {
-    this.healthBar && this.healthBar.setPercent(this.health / controller.enemyHp * 100)
+    this.healthBar && this.healthBar.setPercent(Math.round(this.health / this.maxHP * 100))
   }
 
   static respawn () {

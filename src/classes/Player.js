@@ -9,7 +9,6 @@ export default class Player extends Phaser.Sprite {
     this.exists = true
     this.anchor.setTo(0.5, 0.5)
     this.game.physics.enable(this)
-    this.health = controller.playerHp
   }
 
   create (x, y) {
@@ -17,21 +16,7 @@ export default class Player extends Phaser.Sprite {
     this.y = y
     this.alive = true
     this.game.add.existing(this)
-
-    this.healthBar = new HealthBar(game, {
-      width: 360,
-      height: 10,
-      x: 200,
-      y: 680,
-      bg: {color: '#651828'},
-      bar: {color: '#9ad5ff'},
-      animationDuration: 100
-    })
     game.log(`Player created`)
-  };
-
-  update () {
-    this.healthBar.setPercent(this.health / controller.playerHp * 100)
   }
 
 }
