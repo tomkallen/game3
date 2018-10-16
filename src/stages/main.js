@@ -19,22 +19,8 @@ export default class Main {
     game.projectiles = new Pool(BasicBullet, {size: 50, name: 'player bullets', sprites: ['basic bullet']})
   }
 
-  static onLevelUpClick () {
-    if (controller.player.gold >= controller.upgradeCost) controller.upgrade()
-  }
-
-  static onNextLevelClick () {
-    game.buttons.nextLevel.visible = true
-    controller.levelUpGame()
-    game.enemy.onNextLevel()
-  }
-
   update () {
     const {world} = controller
-    if (controller.readyForNextLevel) game.buttons.nextLevel.visible = true
-    if (controller.player.gold < controller.upgradeCost) {
-      game.buttons.upgrade.setAll('tint', 0x555555)
-    } else game.buttons.upgrade.setAll('tint', 0xffffff)
 
     Main.fire()
     game.physics.arcade.overlap(
@@ -44,9 +30,6 @@ export default class Main {
 
     game.bars.xp.setPercent(Math.round(controller.player.xp / controller.player.xpNeeded * 100))
     game.textController.worldInfo.text = `Wave ${world.wave} / ${world.wavesPerZone} | Zone ${world.zone} / ${world.zonesPerLevel} | World ${world.level}`
-    game.textController.progress.text = `Level ${controller.player.level}, upgrade ${controller.currentUpgradeStep} / ${controller.stepsForLevel}`
-    game.textController.stats.text = `damage ${controller.player.damage.current}`
-    game.textController.cost.text = `Gold ${controller.player.gold}, cost ${controller.upgradeCost}`
   }
 
   static createPlayer () {
@@ -79,30 +62,25 @@ export default class Main {
         y: 160,
         bg: {color: '#651828'},
         bar: {color: '#30b920'}
-
       })
     }
   }
 
   static createButtons () {
-    const nextLevel = game.add.group()
-    nextLevel.add(game.add.button(300, 80, 'button96x32', Main.onNextLevelClick, this))
-    nextLevel.add(game.add.text(330, 86, 'next', {font: '16px Arial', fill: '#000'}))
-
-    const upgrade = game.add.group()
-    upgrade.add(game.add.button(684, 144, 'button96x32', Main.onLevelUpClick, this))
-
-    game.buttons = {nextLevel, upgrade}
-    game.buttons.nextLevel.visible = false
+    // const nextLevel = game.add.group()
+    // nextLevel.add(game.add.button(300, 80, 'button96x32', Main.onNextLevelClick, this))
+    // nextLevel.add(game.add.text(330, 86, 'next', {font: '16px Arial', fill: '#000'}))
+    //
+    // const upgrade = game.add.group()
+    // upgrade.add(game.add.button(684, 144, 'button96x32', Main.onLevelUpClick, this))
+    //
+    // game.buttons = {nextLevel, upgrade}
+    // game.buttons.nextLevel.visible = false
   }
 
   static createText () {
     game.textController = {
-      worldInfo: game.add.text(20, 40, '', style),
-      upgradeText: game.add.text(702, 150, 'upgrade', {font: '16px Arial', fill: '#000'}),
-      progress: game.add.text(500, 300, 'text', {font: '16px Arial', fill: '#fff'}),
-      stats: game.add.text(500, 340, 'text', {font: '16px Arial', fill: '#fff'}),
-      cost: game.add.text(500, 380, 'text', {font: '16px Arial', fill: '#fff'})
+      worldInfo: game.add.text(20, 50, '', style)
     }
   }
 }

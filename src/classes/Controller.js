@@ -18,12 +18,6 @@ class Controller {
       zonesPerLevel: 100
     }
 
-    // Levels
-    this.gameLevel = 1
-    this.upgradeCost = 120
-
-    this.baseStepsForLevel = 5
-    this.currentUpgradeStep = 0
     this.readyForNextLevel = false
     this.respawnTimer = 250
 
@@ -41,8 +35,7 @@ class Controller {
       gold: 0,
       level: 1,
       xp: 0,
-      xpNeeded: 200,
-      upgradesPerLevel: 5,
+      xpNeeded: 100,
       damage: {
         current: 12,
         modifierPerUpgrade: 1.015,
@@ -53,18 +46,6 @@ class Controller {
         multiplier: 2
       }
     }
-  }
-
-  upgrade () {
-    this.currentUpgradeStep++
-    this.player.gold -= this.upgradeCost
-    this.player.damage.current = Math.round(this.player.damage.current * 1.15)
-    if (this.currentUpgradeStep > this.stepsForLevel) {
-      this.currentUpgradeStep = 0
-      this.player.damage.current *= 2
-      this.player.level++
-      this.upgradeCost = Math.round(this.upgradeCost * 3)
-    } else this.upgradeCost = Math.round(this.upgradeCost * 1.33)
   }
 
   getEnemyGold () {
@@ -113,17 +94,12 @@ class Controller {
   levelUpGame () {
     game.log('Next level')
     Text.level(`Next Level`, 'gold')
-    this.gameLevel++
     this.readyForNextLevel = false
   }
 
   addGold () {
     game.log(`Got ${this.getEnemyGold()} gold`)
     this.player.gold += this.getEnemyGold()
-  }
-
-  get stepsForLevel () {
-    return this.baseStepsForLevel + Math.floor(this.gameLevel / 100)
   }
 }
 

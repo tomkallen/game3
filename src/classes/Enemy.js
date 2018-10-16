@@ -77,7 +77,7 @@ export default class Enemy extends Phaser.Sprite {
     tween.onComplete.add(() => {
       this.healthBar = new HealthBar(game, {
         width: 360,
-        height: 10,
+        height: 20,
         x: 200,
         y: 24,
         bg: {color: '#651828'},
