@@ -1,6 +1,7 @@
 import game, { HealthBar, Text } from '../game'
 import Phaser from 'phaser-ce'
 import controller from './Controller'
+import numeral from "numeral"
 
 export default class Enemy extends Phaser.Sprite {
   constructor (sprite) {
@@ -9,12 +10,12 @@ export default class Enemy extends Phaser.Sprite {
     this.exists = false
     this.anchor.setTo(0.5)
     this.game.physics.enable(this)
+    this.body.allowGravity = false
     this.body.immovable = false
-    this.alive = false
   }
 
   spawn () {
-    this.reset(200, 0)
+    this.reset(200, -50)
     this.alive = true
     this.exists = true
     this.health = controller.getEnemyHP()
@@ -23,67 +24,48 @@ export default class Enemy extends Phaser.Sprite {
     game.log(`Creating enemy with ${this.health} hp and ${this.gold} gold`)
     game.add.existing(this)
     game.physics.arcade.enable(this)
+    this.healthText = game.add.text(24, 28, '', {
+      font: '16px Nanum Gothic',
+      fill: '#feeeaa',
+      boundsAlignH: 'left',
+      boundsAlignV: 'middle'
+    })
     this.getTween()
   }
 
-  onNextLevel () {
-    this.health = controller.getEnemyHP()
-    this.maxHP = controller.getEnemyHP()
-    this.gold = controller.getEnemyGold()
+  blink () {
+    this.tint = 0xaa5555
+    window.setTimeout(() => this.tint = 0xffffff, 40)
   }
 
   onDeath () {
-    this.healthBar.kill()
+    this.health = 0
     this.kill()
-    controller.enemyActive = false
-    setTimeout(Enemy.respawn, controller.respawnTimer)
-  }
-
-  onHit (bullet) {
-    if (!controller.enemyActive) return
-    this.blink()
-    bullet.kill()
-    game.sfx.lowHit.play()
-    const data = controller.playerDamage
-    const damage = data.damage
-    const critical = data.critical
-    const type = critical ? 'crit' : 'hit'
-    this.health -= damage
-    Text.combat(this, damage, type)
-    if (this.health <= 0) {
-      this.onDeath()
-      controller.onEnemyKill()
-    }
-  }
-
-  blink () {
-    this.tint = 0xff0000
-    window.setTimeout(() => this.tint = 0xffffff, 40)
+    this.healthBar.kill()
+    this.healthText.kill()
+    controller.onEnemyKill()
   }
 
   update () {
     this.healthBar && this.healthBar.setPercent(Math.round(this.health / this.maxHP * 100))
-  }
-
-  static respawn () {
-    const enemy = new Enemy('enemy')
-    enemy.spawn()
-    game.enemy = enemy
+    this.healthText.text = numeral(this.health).format('0.[00]a')
+    this.healthText.visible = controller.enemyActive
   }
 
   getTween () {
     const tween = game.add.tween(this)
-    tween.to({x: 200, y: 120}, 1000, undefined, true)
+    tween.to({x: 200, y: 100}, 1000, undefined, true)
     tween.onComplete.add(() => {
       this.healthBar = new HealthBar(game, {
         width: 360,
-        height: 20,
+        height: 12,
         x: 200,
-        y: 24,
-        bg: {color: '#651828'},
-        bar: {color: '#FEFF03'},
-        animationDuration: 50
+        y: 16,
+        bg: {color: '#635a65'},
+        bar: {color: '#fcffbe'},
+        animationDuration: 30
       })
+
       controller.enemyActive = true
     })
     tween.start()

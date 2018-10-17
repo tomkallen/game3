@@ -1,4 +1,4 @@
-import game, { Text } from '../game'
+import game from '../game'
 
 const ENEMY_GOLD = 50
 const ENEMY_GOLD_MODIFIER = 1.11
@@ -6,9 +6,10 @@ const ENEMY_HP = 25
 const ENEMY_HP_MODIFIER = 1.125
 const PLAYER_XP = 200
 const PLAYER_XP_MODIFIER = 1.15
+const PLAYER_DAMAGE = 5
+const PLAYER_DAMAGE_MODIFIER = 2.5
 
 class Controller {
-
   constructor () {
     this.world = {
       level: 1,
@@ -18,16 +19,8 @@ class Controller {
       zonesPerLevel: 100
     }
 
-    this.readyForNextLevel = false
-    this.respawnTimer = 250
-
-    // Gold
-    this.gold = 0
-
-    // Enemy dmg & hp
     this.enemyActive = false
 
-    // Player dmg & hp
     this.playerProjectileSpeed = 1500
     this.playerProjectileSpacing = 250
 
@@ -61,10 +54,14 @@ class Controller {
   }
 
   get playerDamage () {
-    let damage = this.player.damage.current
+    let damage = this.getBasicDamage()
     const critical = Math.random() <= this.player.critical.chance
     if (critical) damage *= this.player.critical.multiplier
     return {damage, critical}
+  }
+
+  getBasicDamage() {
+    return Math.round(PLAYER_DAMAGE * PLAYER_DAMAGE_MODIFIER * this.player.level)
   }
 
   onEnemyKill () {
@@ -89,12 +86,6 @@ class Controller {
     this.player.xp = 0
     this.player.level += 1
     this.player.xpNeeded = this.getKillsForLevel()
-  }
-
-  levelUpGame () {
-    game.log('Next level')
-    Text.level(`Next Level`, 'gold')
-    this.readyForNextLevel = false
   }
 
   addGold () {

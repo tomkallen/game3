@@ -4,7 +4,7 @@ import WebFont from 'webfontloader'
 const WebFontConfig = {
   active () { Game },
   google: {
-    families: ['Press Start 2P']
+    families: ['Nanum Gothic', 'Press Start 2P']
   }
 }
 

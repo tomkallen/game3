@@ -21,7 +21,7 @@ export default class Pool extends Phaser.Group {
     }
     game.log(`Creating new Pool of ${props.size} elements`)
     return this
-  };
+  }
 
   create (x, y, options) {
     let obj = this.getFirstExists(false)
@@ -35,5 +35,5 @@ export default class Pool extends Phaser.Group {
 
   getRandomSprite () {
     return this.sprites[Math.floor(Math.random() * this.sprites.length)]
-  };
+  }
 }

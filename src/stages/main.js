@@ -1,21 +1,20 @@
 import BasicBullet from '../classes/BasicBullet'
-import game, { HealthBar } from '../game'
-import { Player, Enemy, GameObject, Pool } from '../classes'
+import game, { HealthBar, Text } from '../game'
+import { Player, Enemy, Pool } from '../classes'
 import controller from '../classes/Controller'
 
 let gameTimer = 0
 
-const style = {font: 'bold 16px Arial', fill: '#fff', boundsAlignH: 'center', boundsAlignV: 'middle'}
+const style = {font: '14px Nanum Gothic', fill: '#fff', boundsAlignH: 'center', boundsAlignV: 'middle'}
 
 export default class Main {
   create () {
-    new GameObject('background_1', 0).classSpawnOne(0, 0)
 
+    game.stage.backgroundColor = '#657e83'
     Main.createPlayer()
-    Main.createEnemy()
     Main.createXPBar()
-    Main.createButtons()
     Main.createText()
+    Main.createEnemy()
     game.projectiles = new Pool(BasicBullet, {size: 50, name: 'player bullets', sprites: ['basic bullet']})
   }
 
@@ -26,22 +25,23 @@ export default class Main {
     game.physics.arcade.overlap(
       game.projectiles,
       game.enemy,
-      (enemy, bullet) => enemy.onHit(bullet))
+      (enemy, bullet) => this.onEnemyHit(bullet, enemy))
 
-    game.bars.xp.setPercent(Math.round(controller.player.xp / controller.player.xpNeeded * 100))
-    game.textController.worldInfo.text = `Wave ${world.wave} / ${world.wavesPerZone} | Zone ${world.zone} / ${world.zonesPerLevel} | World ${world.level}`
+    Main.renderBars()
+    game.textController.worldInfo.text = `Wave ${world.wave} / ${world.wavesPerZone} — Zone ${world.zone} / ${world.zonesPerLevel} — World ${world.level}`
   }
 
   static createPlayer () {
     const player = new Player('player')
-    player.create(200, 620)
+    player.create(200, 660)
     game.player = player
   }
 
-  static createEnemy () {
+  static createEnemy (oldEnemy) {
     const enemy = new Enemy('enemy')
     enemy.spawn()
     game.enemy = enemy
+    oldEnemy && oldEnemy.destroy(true)
   }
 
   static fire () {
@@ -56,31 +56,49 @@ export default class Main {
   static createXPBar () {
     game.bars = {
       xp: new HealthBar(game, {
-        width: 240,
-        height: 16,
-        x: 560,
-        y: 160,
-        bg: {color: '#651828'},
-        bar: {color: '#30b920'}
+        width: 360,
+        height: 12,
+        x: 200,
+        y: 700,
+        bg: {color: '#635a65'},
+        bar: {color: '#fcffbe'},
+        animationDuration: 30
       })
     }
   }
 
-  static createButtons () {
-    // const nextLevel = game.add.group()
-    // nextLevel.add(game.add.button(300, 80, 'button96x32', Main.onNextLevelClick, this))
-    // nextLevel.add(game.add.text(330, 86, 'next', {font: '16px Arial', fill: '#000'}))
-    //
-    // const upgrade = game.add.group()
-    // upgrade.add(game.add.button(684, 144, 'button96x32', Main.onLevelUpClick, this))
-    //
-    // game.buttons = {nextLevel, upgrade}
-    // game.buttons.nextLevel.visible = false
-  }
-
   static createText () {
     game.textController = {
-      worldInfo: game.add.text(20, 50, '', style)
+      worldInfo: game.add.text(500, 16, '', style),
+      enemyHP: game.add.text(20, 80, '', {
+        font: '24px Nanum Gothic',
+        fill: '#000',
+        boundsAlignH: 'center',
+        boundsAlignV: 'middle'
+      })
     }
+  }
+
+  static renderBars () {
+    game.bars.xp.setPercent(Math.round(controller.player.xp / controller.player.xpNeeded * 100))
+  }
+
+  onEnemyHit (bullet, enemy) {
+    if (!controller.enemyActive) return
+    enemy.blink()
+    bullet.kill()
+    game.sfx.lowHit.play()
+    const data = controller.playerDamage
+    const damage = data.damage
+    const critical = data.critical
+    const type = critical ? 'crit' : 'hit'
+    enemy.health -= damage
+    Text.combat(enemy, damage, type)
+    if (enemy.health <= 0) this.onEnemyDeath(enemy)
+  }
+
+  onEnemyDeath (enemy) {
+    enemy.onDeath()
+    window.setTimeout(() => Main.createEnemy(enemy), 2000)
   }
 }
