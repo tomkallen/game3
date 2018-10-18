@@ -4,15 +4,14 @@ import numeral from 'numeral'
 export const Text = {
   level: function (t) {
     const text = game.add.text(game.width / 4, game.height / 2, t,{
-      font: '40px Monoton',
+      font: '46px Monoton',
       fill:  '#ffe6dc',
       align: 'center',
       stroke: '#000000',
       strokeThickness: 3
     })
     text.anchor.set(0.5)
-    game.add.tween(text.scale).to({x: 1.5, y: 1.5}, 2000, 'Linear', true)
-    game.add.tween(text).to({alpha: 0}, 2000, 'Linear', true)
+    game.add.tween(text).to({alpha: 0}, 3000, 'Linear', true)
   },
   combat: function (object, message, event) {
     let style

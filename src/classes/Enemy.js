@@ -24,7 +24,7 @@ export default class Enemy extends Phaser.Sprite {
     game.log(`Creating enemy with ${this.health} hp and ${this.gold} gold`)
     game.add.existing(this)
     game.physics.arcade.enable(this)
-    this.healthText = game.add.text(18, 20, '', Text.styles.ui)
+    this.healthText = game.add.text(19, 18, '', Text.styles.ui)
     this.getTween()
     return this
   }
@@ -59,7 +59,7 @@ export default class Enemy extends Phaser.Sprite {
         x: 200,
         y: 16,
         bg: {color: '#635a65'},
-        bar: {color: '#ffe6dc'},
+        bar: {color: '#e4cbc1'},
         animationDuration: 30
       })
 
