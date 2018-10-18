@@ -2,45 +2,36 @@ import BasicBullet from '../classes/BasicBullet'
 import game, { HealthBar, Text } from '../game'
 import { Player, Enemy, Pool } from '../classes'
 import controller from '../classes/Controller'
+import numeral from "numeral"
 
 let gameTimer = 0
 
-const style = {font: '14px Nanum Gothic', fill: '#fff', boundsAlignH: 'center', boundsAlignV: 'middle'}
-
 export default class Main {
   create () {
-
     game.stage.backgroundColor = '#657e83'
     Main.createPlayer()
     Main.createXPBar()
     Main.createText()
     Main.createEnemy()
     game.projectiles = new Pool(BasicBullet, {size: 50, name: 'player bullets', sprites: ['basic bullet']})
+    Text.level('World 1')
   }
 
   update () {
     const {world} = controller
-
-    Main.fire()
-    game.physics.arcade.overlap(
-      game.projectiles,
-      game.enemy,
-      (enemy, bullet) => this.onEnemyHit(bullet, enemy))
-
     Main.renderBars()
+    Main.fire()
+    game.physics.arcade.overlap(game.projectiles, game.enemy, (e, b) => this.onEnemyHit(e, b))
     game.textController.worldInfo.text = `Wave ${world.wave} / ${world.wavesPerZone} — Zone ${world.zone} / ${world.zonesPerLevel} — World ${world.level}`
+    game.textController.gold.text = `Gold:  ${numeral(controller.player.gold).format('0.[00]a')}`
   }
 
   static createPlayer () {
-    const player = new Player('player')
-    player.create(200, 660)
-    game.player = player
+    game.player = new Player('player').create(200, 660)
   }
 
   static createEnemy (oldEnemy) {
-    const enemy = new Enemy('enemy')
-    enemy.spawn()
-    game.enemy = enemy
+    game.enemy = new Enemy('enemy').spawn()
     oldEnemy && oldEnemy.destroy(true)
   }
 
@@ -69,13 +60,9 @@ export default class Main {
 
   static createText () {
     game.textController = {
-      worldInfo: game.add.text(500, 16, '', style),
-      enemyHP: game.add.text(20, 80, '', {
-        font: '24px Nanum Gothic',
-        fill: '#000',
-        boundsAlignH: 'center',
-        boundsAlignV: 'middle'
-      })
+      worldInfo: game.add.text(460, 16, '', Text.styles.basic),
+      enemyHP: game.add.text(20, 80, '', Text.styles.basic),
+      gold: game.add.text(480, 660, `Gold:  0`, Text.styles.ui)
     }
   }
 
@@ -83,7 +70,7 @@ export default class Main {
     game.bars.xp.setPercent(Math.round(controller.player.xp / controller.player.xpNeeded * 100))
   }
 
-  onEnemyHit (bullet, enemy) {
+  onEnemyHit (enemy, bullet) {
     if (!controller.enemyActive) return
     enemy.blink()
     bullet.kill()
@@ -99,6 +86,6 @@ export default class Main {
 
   onEnemyDeath (enemy) {
     enemy.onDeath()
-    window.setTimeout(() => Main.createEnemy(enemy), 2000)
+    window.setTimeout(() => Main.createEnemy(enemy), 200)
   }
 }

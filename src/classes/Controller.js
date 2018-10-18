@@ -2,11 +2,11 @@ import game from '../game'
 
 const ENEMY_GOLD = 50
 const ENEMY_GOLD_MODIFIER = 1.11
-const ENEMY_HP = 25
+const ENEMY_HP = 1250
 const ENEMY_HP_MODIFIER = 1.125
 const PLAYER_XP = 200
 const PLAYER_XP_MODIFIER = 1.15
-const PLAYER_DAMAGE = 5
+const PLAYER_DAMAGE = 11
 const PLAYER_DAMAGE_MODIFIER = 2.5
 
 class Controller {
@@ -35,7 +35,7 @@ class Controller {
         modifierPerLevel: 2
       },
       critical: {
-        chance: 0.05,
+        chance: 0.125,
         multiplier: 2
       }
     }
